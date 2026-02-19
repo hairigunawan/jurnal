@@ -7,11 +7,11 @@ import { prisma } from '@/lib/prisma';
  * Note: params must be awaited as it is a Promise in recent versions.
  */
 export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json({ error: 'ID tidak ditemukan' }, { status: 400 });
