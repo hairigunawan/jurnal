@@ -2,14 +2,7 @@
 "use client";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis } from 'recharts';
 import { Activity } from "lucide-react";
-
-interface Trade {
-  id: number;
-  pnl: number;
-  dateEntry: string;
-  dateExit: string;
-  instrument: string;
-}
+import { Trade } from "@prisma/client";
 
 interface Props {
   trades: Trade[];
@@ -17,17 +10,19 @@ interface Props {
 
 export default function HoldingTimeView({ trades }: Props) {
   // Calculate holding time in hours (simplified)
-  const data = trades.map(t => {
-    const entry = new Date(t.dateEntry);
-    const exit = new Date(t.dateExit);
-    const hours = Math.max(0.5, (exit.getTime() - entry.getTime()) / (1000 * 60 * 60)); // min 0.5h for visualization
-    return {
-      hours: parseFloat(hours.toFixed(1)),
-      pnl: t.pnl,
-      instrument: t.instrument,
-      id: t.id
-    };
-  });
+  const data = trades
+    .filter(t => t.dateEntry && t.dateExit) // Only for closed trades
+    .map(t => {
+      const entry = new Date(t.dateEntry);
+      const exit = new Date(t.dateExit!);
+      const hours = Math.max(0.5, (exit.getTime() - entry.getTime()) / (1000 * 60 * 60)); // min 0.5h for visualization
+      return {
+        hours: parseFloat(hours.toFixed(1)),
+        pnl: t.pnl,
+        instrument: t.instrument,
+        id: t.id
+      };
+    });
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">

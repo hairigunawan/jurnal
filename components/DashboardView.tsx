@@ -5,21 +5,7 @@ import {
   BarChart, Bar, Cell, PieChart, Pie 
 } from 'recharts';
 import { TrendingUp, TrendingDown, Activity, DollarSign, Target, Calendar } from "lucide-react";
-
-interface Trade {
-  id: number;
-  dateEntry: string;
-  instrument: string;
-  pnl: number;
-  result: string;
-}
-
-interface Transaction {
-  id: number;
-  date: string;
-  type: string;
-  amount: number;
-}
+import { Trade, Transaction } from "@prisma/client";
 
 interface Props {
   trades: Trade[];
@@ -51,7 +37,13 @@ export default function DashboardView({ trades, transactions, onOpenTransactionM
   // --- DATA UNTUK CHART ---
   
   // 1. Equity Curve (Akumulasi Profit per Trade)
-  const equityData = trades.reduce((acc: any[], trade, index) => {
+  interface EquityData {
+    name: string;
+    balance: number;
+    pnl: number;
+  }
+  
+  const equityData = trades.reduce((acc: EquityData[], trade, index) => {
     const prevBalance = index > 0 ? acc[index - 1].balance : 0;
     const currentBalance = prevBalance + trade.pnl;
     acc.push({
@@ -63,12 +55,18 @@ export default function DashboardView({ trades, transactions, onOpenTransactionM
   }, []);
 
   // 2. Performance per Instrumen
-  const instrumentStats: any = {};
+  const instrumentStats: Record<string, number> = {};
   trades.forEach(t => {
     if (!instrumentStats[t.instrument]) instrumentStats[t.instrument] = 0;
     instrumentStats[t.instrument] += t.pnl;
   });
-  const instrumentData = Object.keys(instrumentStats).map(key => ({
+  
+  interface ChartData {
+    name: string;
+    value: number;
+  }
+  
+  const instrumentData: ChartData[] = Object.keys(instrumentStats).map(key => ({
     name: key,
     value: instrumentStats[key]
   })).sort((a, b) => b.value - a.value); // Sort by highest profit

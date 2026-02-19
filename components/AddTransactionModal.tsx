@@ -2,11 +2,12 @@
 "use client";
 import { useState } from "react";
 import { X, Landmark, Loader2 } from "lucide-react";
+import { Transaction } from "@prisma/client";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (transaction: any) => Promise<void>; // Ubah jadi Promise
+  onAdd: (transaction: Partial<Transaction>) => Promise<void>; // Ubah jadi Promise
 }
 
 export default function AddTransactionModal({ isOpen, onClose, onAdd }: Props) {

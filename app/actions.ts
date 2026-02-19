@@ -2,9 +2,10 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { Trade, Transaction } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
-export async function getTrades() {
+export async function getTrades(): Promise<Trade[]> {
   try {
     return await prisma.trade.findMany({
       orderBy: { createdAt: 'desc' },
@@ -15,21 +16,26 @@ export async function getTrades() {
   }
 }
 
-export async function addTrade(data: any) {
+export async function addTrade(data: Partial<Trade>) {
   try {
     const newTrade = await prisma.trade.create({
       data: {
         dateEntry: String(data.dateEntry),
-        dateExit: String(data.dateExit),
+        dateExit: data.dateExit ? String(data.dateExit) : null,
         instrument: String(data.instrument),
         position: String(data.position),
+        status: String(data.status || "Closed"),
         entry: Number(data.entry),
-        exit: Number(data.exit),
+        exit: data.exit ? Number(data.exit) : null,
+        tp: data.tp ? Number(data.tp) : null,
+        sl: data.sl ? Number(data.sl) : null,
         lot: Number(data.lot),
         fees: Number(data.fees),
         pnl: Number(data.pnl),
         rate: Number(data.rate),
         result: String(data.result),
+        setup: data.setup ? String(data.setup) : null,
+        timeframe: data.timeframe ? String(data.timeframe) : null,
         notes: data.notes || null,
       },
     })
@@ -41,7 +47,7 @@ export async function addTrade(data: any) {
   }
 }
 
-export async function getTransactions() {
+export async function getTransactions(): Promise<Transaction[]> {
   try {
     return await prisma.transaction.findMany({
       orderBy: { createdAt: 'desc' },
@@ -52,7 +58,7 @@ export async function getTransactions() {
   }
 }
 
-export async function addTransaction(data: any) {
+export async function addTransaction(data: Partial<Transaction>) {
   try {
     // Validasi data sebelum simpan
     if (!data.amount || isNaN(Number(data.amount))) {
@@ -88,22 +94,27 @@ export async function deleteTrade(id: number) {
   }
 }
 
-export async function updateTrade(id: number, data: any) {
+export async function updateTrade(id: number, data: Partial<Trade>) {
   try {
     const updatedTrade = await prisma.trade.update({
       where: { id },
       data: {
         dateEntry: String(data.dateEntry),
-        dateExit: String(data.dateExit),
+        dateExit: data.dateExit ? String(data.dateExit) : null,
         instrument: String(data.instrument),
         position: String(data.position),
+        status: String(data.status || "Closed"),
         entry: Number(data.entry),
-        exit: Number(data.exit),
+        exit: data.exit ? Number(data.exit) : null,
+        tp: data.tp ? Number(data.tp) : null,
+        sl: data.sl ? Number(data.sl) : null,
         lot: Number(data.lot),
         fees: Number(data.fees),
         pnl: Number(data.pnl),
         rate: Number(data.rate),
         result: String(data.result),
+        setup: data.setup ? String(data.setup) : null,
+        timeframe: data.timeframe ? String(data.timeframe) : null,
         notes: data.notes || null,
       },
     })

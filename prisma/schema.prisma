@@ -13,16 +13,21 @@ model Trade {
   createdAt   DateTime @default(now())
   
   dateEntry   String
-  dateExit    String
+  dateExit    String?
   instrument  String
   position    String   // "Long" atau "Short"
+  status      String   @default("Closed") // "Running", "Closed", "Pending"
   entry       Float
-  exit        Float
+  exit        Float?
+  tp          Float?
+  sl          Float?
   lot         Float
   fees        Float
   pnl         Float
   rate        Float
-  result      String   // "Win" atau "Loss"
+  result      String   // "Win" atau "Loss" atau "Running"
+  setup       String?
+  timeframe   String?
   notes       String?  // Catatan tambahan (opsional)
 }
 

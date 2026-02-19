@@ -2,14 +2,7 @@
 "use client";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { Target, Zap, ShieldAlert, Award } from "lucide-react";
-
-interface Trade {
-  id: number;
-  pnl: number;
-  instrument: string;
-  result: string;
-  position: string;
-}
+import { Trade } from "@prisma/client";
 
 interface Props {
   trades: Trade[];
@@ -30,12 +23,17 @@ export default function OverviewView({ trades }: Props) {
   const bestTrade = Math.max(...trades.map(t => t.pnl), 0);
   const worstTrade = Math.min(...trades.map(t => t.pnl), 0);
 
-  const instrumentDistribution = trades.reduce((acc: any, t) => {
+  const instrumentDistribution = trades.reduce((acc: Record<string, number>, t) => {
     acc[t.instrument] = (acc[t.instrument] || 0) + 1;
     return acc;
   }, {});
 
-  const distributionData = Object.keys(instrumentDistribution).map(key => ({
+  interface DistributionData {
+    name: string;
+    value: number;
+  }
+
+  const distributionData: DistributionData[] = Object.keys(instrumentDistribution).map(key => ({
     name: key,
     value: instrumentDistribution[key]
   }));

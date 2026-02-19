@@ -5,8 +5,15 @@ import {
   PieChart, Pie // <--- Ini yang ditambahkan
 } from 'recharts';
 
+interface ChartEntry {
+  name: string;
+  profit: number;
+  equity: number;
+  color?: string;
+}
+
 // Custom Tooltip untuk tampilan lebih bersih
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: any) => { // recharts tooltips are notoriously hard to type perfectly without 'any'
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 border border-gray-100 shadow-lg rounded-lg text-xs">
@@ -22,7 +29,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export function MonthlyChart({ data }: { data: any[] }) {
+export function MonthlyChart({ data }: { data: ChartEntry[] }) {
   return (
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -43,7 +50,7 @@ export function MonthlyChart({ data }: { data: any[] }) {
   );
 }
 
-export function DailyChart({ data }: { data: any[] }) {
+export function DailyChart({ data }: { data: ChartEntry[] }) {
   return (
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">

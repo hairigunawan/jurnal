@@ -12,16 +12,17 @@ import TemporalView from "@/components/TemporalView";
 import HoldingTimeView from "@/components/HoldingTimeView";
 import { Plus, Filter, Calendar as CalIcon, Moon, Sun, Search } from "lucide-react";
 import { getTrades, getTransactions, addTrade, addTransaction, deleteTrade, updateTrade } from "./actions";
+import { Trade, Transaction } from "@prisma/client";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
-  const [editingTrade, setEditingTrade] = useState<any>(null);
+  const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
   
-  const [trades, setTrades] = useState<any[]>([]);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
@@ -43,7 +44,7 @@ export default function Home() {
     loadData();
   }, []);
 
-  const handleAddTrade = async (newTrade: any) => {
+  const handleAddTrade = async (newTrade: Partial<Trade>) => {
     try {
       if (editingTrade) {
         const updated = await updateTrade(editingTrade.id, newTrade);
@@ -54,14 +55,15 @@ export default function Home() {
       }
       setIsModalOpen(false);
       setEditingTrade(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to save trade:", error);
-      alert(`Error: ${error.message || "Gagal menyimpan trade"}`);
+      const message = error instanceof Error ? error.message : "Gagal menyimpan trade";
+      alert(`Error: ${message}`);
       throw error;
     }
   };
 
-  const handleEditClick = (trade: any) => {
+  const handleEditClick = (trade: Trade) => {
     setEditingTrade(trade);
     setIsModalOpen(true);
   };
@@ -71,14 +73,15 @@ export default function Home() {
     setEditingTrade(null);
   };
 
-  const handleAddTransaction = async (newTx: any) => {
+  const handleAddTransaction = async (newTx: Partial<Transaction>) => {
     try {
       const savedTx = await addTransaction(newTx);
       setTransactions([savedTx, ...transactions]);
       setIsTxModalOpen(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to add transaction:", error);
-      alert(`Error: ${error.message || "Gagal menyimpan transaksi ke database"}`);
+      const message = error instanceof Error ? error.message : "Gagal menyimpan transaksi ke database";
+      alert(`Error: ${message}`);
       throw error;
     }
   };
@@ -113,7 +116,7 @@ export default function Home() {
       
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <main className="ml-64 flex-1 p-6 transition-all">
+      <main className="ml-64 flex-1 p-4 transition-all">
         <header className="flex justify-between items-center mb-6 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <button onClick={() => setIsModalOpen(true)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 dark:text-gray-300 transition-colors">
